@@ -9,6 +9,8 @@ export async function apiKeyMiddleware(req, res, next) {
       return res.status(401).json({ error: 'API key required' });
     }
     
+    let keyData = null;
+    
     // Check cache first (if Redis available)
     if (redisClient) {
       const cached = await redisClient.get(`apikey:${apiKey}`);

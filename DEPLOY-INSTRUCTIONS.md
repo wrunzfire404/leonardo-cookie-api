@@ -5,15 +5,15 @@
 ### 1. SSH ke VPS
 
 ```bash
-ssh ubuntu@168.110.202.124
-# Password: reza1254
+ssh ubuntu@YOUR_VPS_IP
+# Use your SSH key or password
 ```
 
 ### 2. Download & Run Deploy Script
 
 ```bash
 # Download script
-curl -o deploy.sh https://raw.githubusercontent.com/wrunzfire404/leonardo-cookie-api/main/deploy.sh
+curl -o deploy.sh https://raw.githubusercontent.com/YOUR_USERNAME/leonardo-cookie-api/main/deploy.sh
 
 # Make executable
 chmod +x deploy.sh
@@ -42,7 +42,7 @@ bash deploy.sh
 
 ```bash
 # Health check
-curl http://168.110.202.124:3003/health
+curl http://YOUR_VPS_IP:3003/health
 
 # Should return:
 # {
@@ -56,7 +56,7 @@ curl http://168.110.202.124:3003/health
 
 Browser:
 ```
-http://168.110.202.124:3003/ui
+http://YOUR_VPS_IP:3003/ui
 ```
 
 Login dengan credentials yang ditampilkan saat deploy.
@@ -71,7 +71,7 @@ Kalau mau pake domain (e.g., `api.leonardoai.yourdomain.com`):
 
 Di domain provider lu, tambah A record:
 ```
-api.leonardoai  →  168.110.202.124
+api.leonardoai  →  YOUR_VPS_IP
 ```
 
 ### 2. Setup Nginx

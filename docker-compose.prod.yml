@@ -21,8 +21,10 @@ services:
     volumes:
       - ./leonardo_cookies.json:/app/leonardo_cookies.json:ro
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - leonardo-network
@@ -39,6 +41,11 @@ services:
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     ports:
       - "5433:5432"  # External port 5433 (avoid conflict)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - leonardo-network
@@ -50,6 +57,11 @@ services:
       - "6380:6379"  # External port 6380 (avoid conflict)
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - leonardo-network

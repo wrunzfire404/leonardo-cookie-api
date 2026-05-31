@@ -133,13 +133,15 @@ router.put('/:id', authMiddleware, async (req, res) => {
     }
     
     // Invalidate cache
-    const keyResult = await pool.query(
-      'SELECT key_value FROM api_keys WHERE id = $1',
-      [req.params.id]
-    );
-    
-    if (keyResult.rows.length > 0) {
-      await redisClient.del(`apikey:${keyResult.rows[0].key_value}`);
+    if (redisClient) {
+      const keyResult = await pool.query(
+        'SELECT key_value FROM api_keys WHERE id = $1',
+        [req.params.id]
+      );
+      
+      if (keyResult.rows.length > 0) {
+        await redisClient.del(`apikey:${keyResult.rows[0].key_value}`);
+      }
     }
     
     res.json({
@@ -171,7 +173,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     );
     
     // Invalidate cache
-    await redisClient.del(`apikey:${keyResult.rows[0].key_value}`);
+    if (redisClient) {
+      await redisClient.del(`apikey:${keyResult.rows[0].key_value}`);
+    }
     
     res.json({ message: 'API key revoked successfully' });
   } catch (error) {
