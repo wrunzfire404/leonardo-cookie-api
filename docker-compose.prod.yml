@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: leonardo-api
+    ports:
+      - "3003:3000"  # External:Internal
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=leonardo_cookie_api
+      - DB_USER=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET}
+      - LEONARDO_COOKIES_PATH=/app/leonardo_cookies.json
+    volumes:
+      - ./leonardo_cookies.json:/app/leonardo_cookies.json:ro
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - leonardo-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: leonardo-postgres
+    environment:
+      - POSTGRES_DB=leonardo_cookie_api
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5433:5432"  # External port 5433 (avoid conflict)
+    restart: unless-stopped
+    networks:
+      - leonardo-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: leonardo-redis
+    ports:
+      - "6380:6379"  # External port 6380 (avoid conflict)
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - leonardo-network
+
+volumes:
+  postgres_data:
+    name: leonardo_postgres_data
+  redis_data:
+    name: leonardo_redis_data
+
+networks:
+  leonardo-network:
+    name: leonardo-network
+    driver: bridge
